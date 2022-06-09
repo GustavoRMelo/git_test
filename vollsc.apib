@@ -1,0 +1,2088 @@
+FORMAT: 1A
+# VOLL SC
+
+Introducing Voll 360 API
+
+* Note: The domain used to call the api depends on your environment, refer this: 
+ **https://YOURDOMAIN.vollsc.com/api**
+* To call the API, you need to generate an API KEY header. You can do it following these steps:                                         
+**1st:** Access your environment as admin user.                                         
+**2nd:** Go to account tab and click on the green button "generate Api Key".                                         
+**3rd:** Use it as "voll-api-key".
+
+## Important Tutorials                                                                  
+
+_To send a HSM (message_template) in a mailing transmission you will need to inform the following parameters: (click on link to see de body)_                                         
+- The outbound number is associated in campaign. Use this endpoint to get the campaign_id: https://vollsc.docs.apiary.io/#reference/0/campaigns/list                                          
+- To get the template to be sent as hsm_id: https://vollsc.docs.apiary.io/#reference/0/hsms/list 
+- To create your mailing transmission use: https://vollsc.docs.apiary.io/#reference/0/mailing-transmission/create 
+
+_To connect your current **CHATBOT** to the VOLL 360:_                                                                                                                                                                    
+
+
+* **Synchronous**                                                                                                                                                                                                                        
+To directly connect using the synchronous method, you will need to access your environment as admin user in VOLL 360:                                         
+**Registers -> Chatbot Artificial Intelligence -> Click on + to create a new**                                          
+**Name:** Inform your CHATBOT name.                                         
+**Message URL:** Inform where VOLL will post all the contact's messages.                                         
+**End URL:** Inform where VOLL will post the end attendance.                                         
+**Authentication:** Choose the authentication method.                                         
+**Time to abandon:** Define time to end your attendance if your contact do not answer you (optional).                                         
+**Error treatment:** Choose what VOLL should do if an error happens in your CHATBOT.
+
+
+* **Asynchronous**                                                                                                                                                                                                                       
+Set up your bot to use this endpoint **to send messages:** https://vollsc.docs.apiary.io/#reference/0/message/send-messages                                                                                                
+All messages received **will be posted** in:
+https://vollsc.docs.apiary.io/#reference/0/chatbot/text-messages
+
+## Agent Attendances [/api/agent_sessions?page={page}&per={per}&start_date={start_date}&end_date={end_date}]
+The platform allows the administrator and supervisor extract the reports of the attendances
++ Parameters
++ page: 1 (number) - Current page.
++ per: 10 (number) - Item count.
++ start_date: `2018-12-25 00:00:00` (datetime) - Attendences started at.
++ end_date: `2015-05-05 12:30:00` (datetime) - Attendences ended at.
+
+### List Agent Attendances [GET]
+* Returns the report of the agents attendances,
+* To list all data use only `/agent_sessions`,
+* You can define some filters by changing the parameters /agent_sessions?page=`page`&per=`per`&start_date=`start_date`&end_date=`end_date`
+
+
++ Request
+    + Headers
+        Authorization: Basic ABC123
+
++ Response 200 (application/json)
+{
+   "items":[
+      {
+        "id": "fb5092f4-cbc1-4806-b5a8-8ddadb5634c5",
+        "started_at": "2021-09-01T02:46:34.145-03:00",
+        "agent_started_at": "2021-09-01T02:46:41.374-03:00",
+        "customer_started_at": "2021-09-01T02:43:11.254-03:00",
+        "ended_at": "2021-09-01T02:47:06.541-03:00",
+        "time_exceeded": null,
+        "formatted_time_exceeded": "00:00:00",
+        "customer_name": "Test Voll",
+        "cpf": "null",
+        "campaign_name": "Camp_Teste_PesquisaDeSatisfacao",
+        "tabulation_name": "TEST",
+        "tabulation_group_name": "TEST",
+        "hook_id": "321321311",
+        "obs": "",
+        "received_message_count": 2,
+        "sent_message_count": 6,
+        "total_messages": 8,
+        "total_time": "00:00:32.395282",
+        "customer_tmr": 4,
+        "agent_tmr": 12,
+        "origin": "in",
+        "agent_name": "Jeferson",
+        "system": "whatsapp",
+        "number": "5511975735523"
+      }
+   ],
+   "page":1,
+   "total_items":1
+}
+
+## Account [/api/accounts]
+This option makes data integration from the indicated Endpoint.
+
+### Change Webhooks and Iframe [POST]
+* Using this endpoint you can change the webhook.
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+{
+   "session_ended_endpoint":"https://voll.requestcatcher.com/",
+   "session_started_endpoint":"https://voll.requestcatcher.com/",
+   "queue_started_endpoint":"https://voll.requestcatcher.com/",
+   “iframe_url”:   “https://google.com”
+}
+
++ Response 200 (application/json)
+
+## Customers [/api/customers]
+If the customer's contact isn't already saved, the agent can creating a new customer to start the attendence
+
+### Create [POST]
+* When creating a whatsapp customer, only valid numbers will be accepted
+* It's possible to direct the customer to an agent or campaign by filling the fields `direct_user_id` and `direct_campaign_id`
+* it's possible to retain an operator by informing the id_user (operator id)
+
++ Headers
+    Authorization: Basic ABC123
+
++ Request (application/json)
+{
+   "name":"Joh",
+   "enterprise_id":"551122223333",
+   "status":"XXX",
+   "product":"XX",
+   "cpf":"11122233345",
+   "cnpj":"00000000000",
+   "email":"email@email.com",
+   "description":"any customer description",
+   "carrier":"Vivo",
+   "phone_extra":"55555555555",
+   "phone_extra2":"6666666666",
+   "obs":"any obs",
+   "external_url":"https://google.com.br",
+   "direct_campaign_id":"154cfd7e-b87a-4986-9f09-2afc555798a5",
+   "direct_user_id":"05eb4cb5-940d-41ce-b928-9667f75590b5",
+   "user_id":"b0033a79-3a8d-4692-b75d-bd3effdf8f4x"
+}
+
+## Customers [/api/customers/search]
+
+### Search [GET]
+* Search customers using filters
+
++ Headers
+    Authorization: Basic ABC123
+
++ Request (application/json)
+{
+   "phone": 5511987654321,
+   "customer_name": "Pedro Santos",
+   "cpf": "493827403", 
+   "cnpj": "13494984000195", 
+   "user_id": "eb338a69-0a94-4cd0-9b2c-f3d0900ea522"
+}
+
++ Response 200 (application/json)
+{
+    "data": [
+        {
+            "id": "eb338a69-0a94-4cd0-9b2c-f3d0900ea522",
+            "name": "Roanaldo Lohmann",
+            "user_id": null,
+            "system": "whatsapp",
+            "created_at": "2020-10-07T13:02:25.967-03:00",
+            "updated_at": "2020-11-23T13:22:31.868-03:00",
+            "cpf": "123123",
+            "cnpj": null,
+            "description": null,
+            "status": null,
+            "carrier": null,
+            "email": "contato_com@seufeskd.com.br",
+            "direct_campaign_id": null,
+            "direct_user_id": null,
+            "whatsapp": "1194848329393",
+            "whatsapp_enteríse": null,
+            "sms": null
+        }
+    ],
+    "total_items": 1
+}
+
+## Customers with messages [/api/customers/messages]
+
+### Create or update customers [POST] 
+* Create or update a customer by adding data to the customer's timeline
+* It is necessary to send the `name` and` service channel`
+* Exemple: `enterprise_id` `customer_id`
+
++ Headers
+    Authorization: Basic ABC123
+
++ Request (application/json)
+{
+   "name":"Joh",
+   "enterprise_id":"551122223333",
+   "status":"XXX",
+   "product":"XX",
+   "cpf":"11122233345",
+   "cnpj":"00000000000",
+   "email":"email@email.com",
+   "description":"any customer description",
+   "carrier":"Vivo",
+   "phone_extra":"55555555555",
+   "phone_extra2":"6666666666",
+   "obs":"any obs",
+   "external_url":"https://google.com.br",
+   "direct_campaign_id":"154cfd7e-b87a-4986-9f09-2afc555798a5",
+   "direct_user_id":"05eb4cb5-940d-41ce-b928-9667f75590b5",
+   "messages": [
+        {
+        "content": "message content",
+        "direction": "in", // in for inbound out for outbound
+        "date": "2020-01-01 13:00:00",
+        "message_type": "text", //text, audio, document, image, video
+        "file_url": "public file url when message type is not text",
+        "filename": "when message type is not text",
+        "platform": "whatsapp", //whatsapp, whatsapp_enterprise,
+        "hook_id": "number used to send the message",
+        "msg_id": "unique id",
+        "sent": "2020-01-01 13:00:01",
+        "recvd":"2020-01-01 13:00:02",
+        "read": "2020-01-01 13:00:03"
+        }
+   ]
+}
+    
++ Response 422 (application/json)
+{
+    "errors": {
+        "enterprise_id": [
+            {
+                "error": "no_whatsapp"
+            }
+    ] }
+}
+{
+    "errors": {
+        "enterprise_id": [
+            {
+            "error":"taken",
+            "value":"5511981417258"
+            }
+    ] }
+}
+{
+    "errors": {
+        "user_id": [
+            {
+                "error": "no_user_found"
+            }
+    ] }
+}
+
+## Messages By Date [/api/customers/messages_by_date]
+
+### messages_by_date [GET]
+* Fetch customer messages within a date range;
+* When creating a request, it is mandatory to send the `formatted_started_at` and` formatted_ended_at` parameters;
+* Also, the media id parameter(e.g.: `telegram_id`) is necessary for the data to be returned corretcly.
+
+
++ Headers
+    Authorization: Basic ABC123
+
++ Request (application/json)
+{
+    "formatted_started_at": "15-03-2022",
+    "formatted_ended_at": "16-03-2022",
+    "telegram_id": "5001440094"
+}
+
++ Response 200 (application/json)
+{
+   "messages": [
+        {
+            "id": "7d6b052b-2fae-47fe-8594-c63e7614ee10",
+            "account_id": "48068c6d-a481-466b-8d00-57dc06a0b0ce",
+            "conversation_id": null,
+            "content": "test message",
+            "direction": "in",
+            "date": "2022-03-16T16:15:51.525-03:00",
+            "message_type": "text",
+            "file_url": null,
+            "latitude": null,
+            "longitude": null,
+            "platform": "telegram",
+            "social_contact_id": "e331d2d9-3ce4-47da-9b07-2ed697e7577b",
+            "user_id": "c67b087d-9dc7-47d8-b1a9-8398bc0b0a2a",
+            "tabulation_id": null,
+            "hook_id": "example_bot",
+            "msg_id": null,
+            "sent": "2022-03-16T16:15:51.593-03:00",
+            "read": null,
+            "recvd": "2022-03-16T16:15:51.593-03:00",
+            "created_at": "2022-03-16T16:15:51.597-03:00",
+            "updated_at": "2022-03-16T16:15:51.597-03:00",
+            "protocol": null,
+            "quoted_message": null,
+            "message_after_break": null,
+            "tabulation_obs": null,
+            "failed": null,
+            "filename": null,
+            "caption": null,
+            "attached_name": null,
+            "attached_number": null,
+            "transcription": null,
+            "error_code": null,
+            "error_message": null,
+            "agent_session_id": "96d19db0-8742-46be-81a8-0151dcd586c0",
+            "queue_session_id": null,
+            "location_name": null,
+            "location_address": null,
+            "is_agent_hsm": null,
+            "interactive_message_data": null
+        },
+    ]
+}
+
+# Customers
+
+## Start Chat [/api/customers/create_and_start_chat]
+The chat is where contact with the customer starts after creating the number.
+
+### Create & Start Chat [POST]
+* When creating a whatsapp customer, only valid numbers will be accepted
+* The request must contain only 1 of the following: customer_id, enterprise_id, sms_id 
+* "no_campaign_hook": If the request returns this error, check if the campaign is configured to send message via the chosen channel
+* it's possible to retain an operator by informing the id_user (operator id)
+
++ Headers
+    Authorization: Basic ABC123
+
++ Request (application/json)
+{
+  "campaign_id": "54cfd7e-b87a-4986-9f09-2afc555798a5",
+  "system":"whatsapp",
+  "customer_data": {
+   "name":"Joh",
+   "enterprise_id":"551122223333",
+   "status":"XXX",
+   "product":"XX",
+   "cpf":"11122233345",
+   "cnpj":"00000000000",
+   "email":"email@email.com",
+   "description":"any customer description",
+   "carrier":"Vivo",
+   "phone_extra":"55555555555",
+   "phone_extra2":"6666666666",
+   "obs":"any obs",
+   "external_url":"https://google.com.br",
+   "direct_campaign_id":"154cfd7e-b87a-4986-9f09-2afc555798a5",
+   "direct_user_id":"05eb4cb5-940d-41ce-b928-9667f75590b5",
+   "user_id":"b0033a79-3a8d-4692-b75d-bd3effdf8f4x"
+   }
+}
+    
++ Response 201 (application/json)
+{
+     "data": {
+        "customer_id": "54f71d4b-0354-41bd-8cb6-09146953ed08",
+        "session_id": "85dc4411-326e-4676-9600-7d2c8061aee3"
+     }
+}
+
++ Response 422 (application/json)
+{
+    "errors": {
+        "enterprise_id": [
+            {
+                "error": "no_whatsapp"
+            }
+    ] }
+}
+
+{
+    "errors": {
+        "enterprise_id": [
+            {
+            "error":"taken",
+            "value":"5511981417258"
+            }
+    ] }
+}
+
++ Response 422 (application/json)
+{
+    "errors": {
+        "campaign": "no_campaign_found"
+    }
+}
+
++ Response 422 (application/json)
+{
+    "errors": {
+        "campaign_hook": "no_campaign_hook"
+    }
+}
+
++ Response 422 (application/json)
+
+{
+    "errors": {
+        "session": "session_already_started"
+    }
+}
+
++ Response 422 (application/json)
+
+{
+    "errors": {
+        "session": "Queue_session_already_started"
+    }
+}
+
++ Response 422 (application/json)
+{
+    "errors": {
+        "user_id": [
+            {
+                "error": "no_user_found"
+            }
+    ] }
+}
+
+## End Sessions [/api/agent_sessions]
+After the customer's doubts are resolved, the service is closed.
+
+### Terminate the service assigned to the agent [PUT]
+* The endpoint ends the service that is found to the agent
+* `"telegram_id": "1395184276", // customer_id, enterpise_id, widget_id` it is necessary to inform the service channel
+* In the case of media that does not have a number, such as the widget, the name registered in ´hook_id` must be informed
+
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+{
+    "telegram_id": "1395184276", // customer_id, enterprise_id, widget_id
+    "hook_id": "telegram",
+    "tabulation_id": "d9385f09-e4be-42eb-8e03-1595e3ed3d16",
+    "tabulation_obs": "Observação da tabulação"
+}
+
++ Response 200 (application/json)
+{
+  "session_id": "b33e7ddb-baea-4d1b-8905-1b6785d3acee"
+}
+
++ Response 422 (application/json)
+{ 
+   "result": "contact_not_found"
+}
+
++ Response 422 (application/json)
+{ 
+   "result": "tabulation_not_found"
+}
+
++ Response 422 (application/json)
+{ 
+   "result": "session_not_found"
+}
+
+## Human Sessions [/api/human_sessions]
+Return data related to ongoing human attendances
+
+### Human Sessions [GET]
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+{
+    "page": "10", 
+    "per": "1", 
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", 
+    "customer_name": "Pedro Arruda",
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "user_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "media": "whatsapp", 
+    "contact_group_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751"
+}
+
++ Response 200 (application/json)
+{
+    "items": [
+        {
+            "id": "25529afe-3313-4e09-8b9d-64ccf89da375",
+            "started_at": "2020-11-23T13:22:31.732-03:00",
+            "agent_started_at": null,
+            "customer_started_at": null,
+            "social_contact_id": "eb338a69-0a94-4cd0-9b2c-f3d0900ea522",
+            "hook_id": "5511941695200",
+            "time_exceeded": null,
+            "sla_last_receive": null,
+            "system": "whatsapp",
+            "customer_last_message_date": null,
+            "agent_last_message_date": null,
+            "skill_campaign_id": null,
+            "last_direction": "agent",
+            "direction": "out",
+            "sla": 1,
+            "group_name": null,
+            "group_color": null,
+            "sla_spent": null,
+            "campaign_name": "Campanha Inbenta",
+            "agent_name": "oper1",
+            "agent_id": "b9f954b8-7b6e-4467-89be-d49f4e7e4f05",
+            "customer_name": "Roanaldo Lohmann",
+            "customer_id": "1194848329393",
+            "enterprise_id": null,
+            "sms_id": null,
+            "agent_sla_limit": 20,
+            "agent_sla_warning": 10,
+            "survey_id": null,
+            "user_status": "idle"
+        }
+    ],
+    "total_items": 1
+}
+
+## Grouped Human Sessions [/api/human_sessions_grouped]
+Return data related to ongoing human attendances with client groups 
+
+### Grouped Human Sessions [GET]
+
+ + Headers
+ Authorization:Basic ABC123
+ 
+ + Request (application/json)
+{
+    "page": "10", 
+    "per": "1", 
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", 
+    "customer_name": "Pedro Arruda",
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "user_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "media": "whatsapp", 
+    "contact_group_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751"
+}
+
++ Response 200 (application/json)
+{
+    "items": [
+        {
+            "id": null,
+            "user_id": "db3a398c-d42f-476e-9916-59a3ce3a3adb",
+            "user_name": "Conbrança",
+            "campaign_name": "Cobrança",
+            "user_status": "idle",
+            "customer_count": 1
+        }
+    ],
+    "total_items": 1
+}
+
+## Chatbot Sessions [/api/chatbot_sessions]
+Return data related to ongoing chatbot attendances
+
+### Chabot Sessions [GET]
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+{
+    "page": "10", 
+    "per": "1", 
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", 
+    "customer_name": "Pedro Arruda",
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "media": "whatsapp", 
+    "contact_group_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751"
+}
+
++ Response 200 (application/json)
+{
+    "items": [
+        {
+            "id": "29c0e64f-1a4d-4c25-a180-af28ce88d6f4",
+            "started_at": "2020-12-21T12:29:43.443-03:00",
+            "agent_started_at": "2020-12-21T12:29:43.443-03:00",
+            "customer_started_at": "2020-12-21T12:29:43.443-03:00",
+            "social_contact_id": "36cf3157-1a0e-4575-bfdf-6d33cb6069d2",
+            "hook_id": "Voll_bot",
+            "time_exceeded": null,
+            "sla_last_receive": null,
+            "system": "telegram",
+            "customer_last_message_date": "2020-12-21T12:29:43.466-03:00",
+            "group_name": null,
+            "group_color": null,
+            "agent_name": "Chatbot",
+            "agent_id": "9d8390b4-02d0-4e9f-9aaf-802543755564",
+            "customer_name": "Cliente Teste",
+            "customer_id": "5511949839682",
+            "enterprise_id": "5511949839682",
+            "user_status": "offline"
+        }
+    ],
+    "total_items": 1
+}
+
+
+## Mailing Transmission [/api/mailings]
+
+### Create [POST]
+* The endpoint has the functionality to import new mailing
+* It is necessary to send all the attributes of the class for the import to be carried out successfully
+* To set the date/time to be sent in your mailing transmission, you can use schedule_date_time. If not informed, the current timestamp (date/time) will be used automatically. 
+* To have the answer from your contact being directed to a specific campaign, use directed_campaigns_attributes (optional)
+* Consult the HSM parameters to fill the "fields" 
+* To set the expiration date that directs the contact answers from your mailing transmission, use expire_date 
++ Headers
+
+    Authorization:Basic ABC123
+
++ Request (application/json)
+{ 
+   "hsm_id":"8316a8d2-8092-44c0-ac20-ad2e9f5f041e",
+   "hsm_type":"hsm",
+   "campaign_id":"417176ac-97c0-4507-b1b8-5159270b14ac",
+   "system":"whatsapp_enterprise",
+   "schedule_datetime": "2020-01-22 14:00:00",
+   “expire_date”: "2020-01-22 14:00:00",
+   “directed_campaigns_attributes”:[{
+        "campaign_id":“417176ac-97c0-4507-b1b8-5159270b14ac", 
+        "campaign_id":"417176ac-97c0-4507-b1b8-5159270b14ac“
+    }],
+   "contacts":[ 
+      { 
+         "phone_number":"5511996428822",
+         "field_1":"Marcio",
+         "field_2":"0",
+         "field_3":"2",
+         "custom_field": "" //optional, updates the 'status' property of the customer after he anwers the message
+      },
+      { 
+         "phone_number":"5511996428828",
+         "field_1":"Jose",
+         "field_2":"0",
+         "field_3":"2"
+      }
+   ]
+}
+
++ Response 200 (application/json)
+{ 
+   "id":"27012a49-86ff-4e7d-a86b-6ed3463ac7d3"
+}
+
+### List [GET/mailings?per={count}&page={page}]
+
+* Use this method to list all mailing programmations
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
++ Response 200 (application/json)
+
+[
+    {
+        "id": "0a5a6cc3-5a60-44bf-8a0c-ced51a6d1b8e",
+        "account_id": "eb07bf25-1f7b-4c68-b4db-3622546e7c7f",
+        "name": "Gabriel",
+        "mailing_id": "fcc24040-9443-4ac5-a0ae-68b6fb8b5f53",
+        "campaign_id": "d71acbed-d3a3-4dee-a834-051350a8e1bd",
+        "hsm_configuration_id": "41b7a123-1fa2-4c4d-9a53-081b2664e960",
+        "start_type": "manual",
+        "send_time_start": null,
+        "send_time_end": null,
+        "send_type": "continuous",
+        "schedule_datetime": null,
+        "status": "ended",
+        "created_at": "2021-11-17T15:31:10.839-03:00",
+        "updated_at": "2021-11-17T15:31:16.254-03:00",
+        "expire_date": "2021-11-17T09:15:00.000-03:00",
+        "system": "whatsapp",
+        "media_hsm_configuration_id": null,
+        "hsm_type": "hsm",
+        "deleted_at": null,
+        "interval": null,
+        "percentual": null,
+        "last_sent_date": null
+    },
+    {
+        "id": "99becfb4-3f04-41d9-bcda-7951f7bc7ea6",
+        "account_id": "eb07bf25-1f7b-4c68-b4db-3622546e7c7f",
+        "name": "Gabriel",
+        "mailing_id": "fcc24040-9443-4ac5-a0ae-68b6fb8b5f53",
+        "campaign_id": "d71acbed-d3a3-4dee-a834-051350a8e1bd",
+        "hsm_configuration_id": "41b7a123-1fa2-4c4d-9a53-081b2664e960",
+        "start_type": "manual",
+        "send_time_start": null,
+        "send_time_end": null,
+        "send_type": "continuous",
+        "schedule_datetime": null,
+        "status": "ended",
+        "created_at": "2021-11-17T15:54:37.896-03:00",
+        "updated_at": "2021-11-17T15:54:40.850-03:00",
+        "expire_date": null,
+        "system": "whatsapp_enterprise",
+        "media_hsm_configuration_id": null,
+        "hsm_type": "hsm",
+        "deleted_at": null,
+        "interval": null,
+        "percentual": null,
+        "last_sent_date": null
+    }
+]
+
+
+### Show [GET/mailings/{programmation_id}?per={count}&page={page}]
+
+* The `GET` route has the functionality of searching for` mailing_programmations`
+* Modify the parameters `programmation id?` Per= `count` & page= `page`, by the value you want to search
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
++ Response 200 (application/json)
+{
+    "id": "f53da9d4-49d9-4d65-bb84-5f99f01e7877",
+    "name": "teste",
+    "status": "working|started|ended|stopped",
+    "total_count": 1,
+    "per": 100,
+    "page": 1,
+    "items": [
+        {
+            "phone_number": "55119999999",
+            "sent": "2020-06-14T12:27:55.696-03:00",
+            "recvd": "2020-06-14T12:27:57.258-03:00",
+            "read": null,
+            "answered": null,
+            "failed": null,
+            "accessed_at": null
+        }
+    ]
+}
+
+## Campaigns [/api/campaigns]
+The campaigns on the platform are the sectors of a company. For example, the Marketing, Support or Sales sector.
+### List [GET]
+* List of activated and deactivated campaigns that contain in the system
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
+
++ Response 200 (application/json)[ 
+   [ 
+   { 
+      "id":"2b2136bb-9644-4635-99c5-ed827e319845",
+      "name":"Campanha de teste 2",
+      "enabled_days": [
+            {
+                "day": 0,
+                "started_at": "2020-05-01T00:00:00.000-03:00",
+                "ended_at": "2020-05-01T00:01:00.000-03:00"
+            },
+            {
+                "day": 1,
+                "started_at": "2020-05-01T07:30:00.000-03:00",
+                "ended_at": "2020-05-01T18:15:00.000-03:00"
+            },
+            {
+                "day": 2,
+                "started_at": "2020-05-01T07:30:00.000-03:00",
+                "ended_at": "2020-05-01T18:15:00.000-03:00"
+            },
+            {
+                "day": 3,
+                "started_at": "2020-05-01T07:30:00.000-03:00",
+                "ended_at": "2020-05-01T18:15:00.000-03:00"
+            },
+            {
+                "day": 4,
+                "started_at": "2020-05-01T07:30:00.000-03:00",
+                "ended_at": "2020-05-01T18:15:00.000-03:00"
+            },
+            {
+                "day": 5,
+                "started_at": "2020-05-01T00:00:00.000-03:00",
+                "ended_at": "2020-05-01T00:01:00.000-03:00"
+            },
+            {
+                "day": 6,
+                "started_at": "2020-05-01T07:30:00.000-03:00",
+                "ended_at": "2020-05-01T12:15:00.000-03:00"
+            }
+        ]
+   },
+   { 
+      "id":"803cd523-e0ce-46b0-8069-d2722c5058fa",
+      "name":"qadqwdqw",
+      "enabled_days": []
+   },
+   { 
+      "id":"154cfd7e-b87a-4986-9f09-2afc555798a5",
+      "name":"wfrf",
+      "enabled_days": []
+   },
+   { 
+      "id":"bd078947-b3a0-400c-a4ee-13b9e5fb8b32",
+      “name":"Campanha Teste",
+      "enabled_days": []
+   },
+   { 
+      "id":"7225b296-e27f-4f62-bc22-6dd828ee46c6",
+      "name":"teste 5555555",
+      "enabled_days": []
+   }
+]
+
+## Tabulations [/api/tabulations]
+Tabulation is a way of recording some information at the end of the service so that it is stored in our database.
+
+### List [GET]
+* List of activated and deactivated campaigns that contain in the system
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
+
++ Response 200 (application/json)[ 
+   [ 
+   { 
+      "id":"2b2136bb-9644-4635-99c5-ed828e319845",
+      "name":"Tabulation 1"
+   },
+   { 
+      "id":"803cd523-e0ce-46b0-8069-d2732c5058fa",
+      "name":"xxxxxxx"
+   },
+   { 
+      "id":"154cfd7e-b87a-4986-9f09-2qfc555798a5",
+      "name":"yyyyyyy"
+   },
+   { 
+      "id":"bd078947-b3a0-400c-a4ee-13b9e5yb8b32",
+      “name":"Tabulacao de Teste"
+   },
+   { 
+      "id":"7225b296-e27f-4f62-bc22-6ds828ee46c6",
+      "name":"teste 33333"
+   }
+]
+
+## Surveys [/api/surveys]
+List of customer service survey configurations to use as filter in reports
+
+### List [GET]
+* List of customer service survey configurations to use as filter in reports
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
+
++ Response 200 (application/json)[ 
+  [
+    {
+        "id": "e186e987-98a5-4123-a264-823ud2j4389u",
+        "name": "financeiro"
+    },
+    {
+        "id": "e186e987-98a5-4123-a264-0ffa031e2733",
+        "name": "atendimento"
+    }
+    {
+        "id": "e186e987-98a5-4123-a264-nd29384wfjds",
+        "name": "reclamacao"
+    }
+]
+
+## HSMS [/api/hsms]
+HSM is a message from the official number to initiate customer contact.
+### List Hsm [GET]
+* The route shows the HSM that contains
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
+
++ Response 200 (application/json)[ 
+   { 
+      "id":"8316a8d2-8092-44c0-ac20-ad2e9f5f041e",
+      "element_name":"welcome",
+      "message":"Welcome Customer",
+      "param1":null,
+      "param2":null,
+      "param3":null,
+      "param4":null,
+      "param5":null,
+      "param6":null,
+      "param7":null,
+      "param8":null,
+      "param9":null,
+      "param10":null
+   },
+   { 
+      "id":"9215a8d2-8092-44c0-ac20-ad2e9f5f041e",
+      "element_name":"bye",
+      "message":"Bye Customer",
+      "param1":null,
+      "param2":null,
+      "param3":null,
+      "param4":null,
+      "param5":null,
+      "param6":null,
+      "param7":null,
+      "param8":null,
+      "param9":null,
+      "param10":null
+   }
+]
+
+## HSMS [/api/media_hsms]
+HSM is a message from the official number to initiate customer contact.
+### List Media Hsm [GET]
+* The route shows the HSM that contains
+
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+
+
++ Response 200 (application/json)[ 
+
+    {
+       "id": "8395c84e-ca67-47f0-8da9-5f7f67b29754",
+       "element_name": "fe017b61-a26f-4cd6-88e3-3e41a699acbb",
+       "message": "Hello,{{1}} how are you?",
+       "param1": null,
+       "param2": null,
+       "param3": null,
+       "param4": null,
+       "param5": null,
+       "param6": null,
+       "param7": null,
+       "param8": null,
+       "param9": null,
+       "param10": null,
+       "param11": null,
+       "param12": null,
+       "param13": null,
+       "param14": null,
+       "param15": null,
+       "param16": null,
+       "param17": null,
+       "param18": null,
+       "param19": null,
+       "param20": null
+    },
+]
+
+## Breaks [/api/reports/break]
+
++ Parameters
++ campaign_id:(string) - ID of the campaign
++ user_id:(string) - ID of the agent
++ formatted_started_at:(date) - Date starting from
++ formatted_ended_at:(date) - Date until
++ per (string) - Records by page
++ page (string) - Page returned
+
+### List users breaks [GET]
+* Returns a report based on Users breaks.
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+
+{
+    "items":[
+        {
+            "id":null,
+            "started_at":"2021-02-22T17:13:52.295-03:00",
+            "ended_at":"2021-02-22T17:21:10.479-03:00",
+            "user_name":"operador",
+            "campaign_name":"campanha",
+            "break_name":"Pausa",
+            "duration_break":5}
+        ],
+        "total_items":1
+    }
+}
+
+## Sent HSM Detailed [/api/reports/sent_hsm]
+
++ Parameters
++ campaign_id:(string) - ID of the campaign
++ user_id:(string) - ID of the agent
++ hsm_configuration_id:(string) - ID of hSM configuration
++ formatted_started_at:(date) - Date starting from
++ formatted_ended_at:(date) - Date until
++ per (string) - Records by page
++ page (string) - Page returned
+
+### Sent HSM Detailed [GET]
+* Returns a report based on sent HSM messages, showing status for each message.
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+
+{
+   "items":[
+      {
+         "id":null,
+         "campaign_name":"Campanha1",
+         "customer_name":null,
+         "customer_number":null,
+         "enterprise_number":null,
+         "user_name":"oper1",
+         "created_date":"2019-12-03T21:51:14.690Z",
+         "hsm_config_title":"HSM teste",
+         "sent":"2019-12-03T21:51:14.690Z",
+         "read":null,
+         "recvd":"2019-12-03T21:51:14.690Z",
+         "failed":null,
+         "mailing_sent":"2019-12-03T21:51:14.690Z",
+         "mailing_recvd":"2019-12-03T21:51:14.690Z",
+         "mailing_read":null,
+         "mailing_failed":null,
+         "mailing_contact_number":null
+      },
+      {
+         "id":null,
+         "campaign_name":"Campanha1",
+         "customer_name":null,
+         "customer_number":null,
+         "enterprise_number":null,
+         "user_name":"teste",
+         "created_date":"2020-03-25T20:56:01.234Z",
+         "hsm_config_title":"HSM teste",
+         "sent":"2020-03-25T20:56:01.234Z",
+         "read":"2020-03-25T20:56:01.234Z",
+         "recvd":"2020-03-25T20:56:01.234Z",
+         "failed":null,
+         "mailing_sent":"2020-03-25T20:56:01.234Z",
+         "mailing_recvd":"2020-03-25T20:56:01.234Z",
+         "mailing_read":"2020-03-25T20:56:01.234Z",
+         "mailing_failed":null,
+         "mailing_contact_number":"5511949836666",
+         "mailing_name": "Random mailing"
+      },
+      {
+         "id":null,
+         "campaign_name":"Campanha1",
+         "customer_name":null,
+         "customer_number":null,
+         "enterprise_number":null,
+         "user_name":"teste",
+         "created_date":"2020-03-25T20:56:49.564Z",
+         "hsm_config_title":"HSM teste",
+         "sent":"2020-03-25T20:56:49.564Z",
+         "read":null,
+         "recvd":null,
+         "failed":"2020-03-25T20:56:49.564Z",
+         "mailing_sent":"2020-03-25T20:56:49.564Z",
+         "mailing_recvd":null,
+         "mailing_read":null,
+         "mailing_failed":"2020-03-25T20:56:49.564Z",
+         "mailing_contact_number":"5511949836666",
+         "mailing_name": "Random mailing"
+      }
+   ],
+   "total_items":3
+}
+
+## Sent HSM Synthetic [/api/reports/sent_hsm_synt]
+
++ Parameters
++ campaign_id:(string) - ID of the campaign
++ user_id:(string) - ID of the agent
++ hsm_configuration_id:(string) - ID of hSM configuration
++ formatted_started_at:(date) - Date starting from
++ formatted_ended_at:(date) - Date until
++ per (string) - Records by page
++ page (string) - Page returned
+
+### Sent HSM Synthetic [GET]
+* Returns a grouped report based on sent HSM messages, showing number of messages with each status.
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+
+{
+   "items":[
+      [
+         {
+            "date":"2019-12-03",
+            "campaign":"Campanha1",
+            "hsm_title":"HSM teste",
+            "attempts":1,
+            "sent":0,
+            "received":0,
+            "read":0,
+            "failed":0
+         }
+      ],
+      [
+         {
+            "date":"2020-03-25",
+            "campaign":"Campanha1",
+            "hsm_title":"HSM teste",
+            "attempts":2,
+            "sent":0,
+            "received":0,
+            "read":0,
+            "failed":0
+         }
+      ]
+   ],
+   "total_items":2
+}
+
+
+## Direct customer to agent - Fidelization [/api/customers/#{customer_id}/direct]
+The route aims to build customer loyalty.
++ Parameters
++ customer_id: (string) - ID of the customer 
+
+### Direct Customers [PUT]
+* Instead of `#customer_id`, you must inform the customer number
+* In the body of the submission, the campaign ID and User must be informed
+* When clicking Send it returns the loyalty ID
++ Headers
+    Authorization:Basic ABC123
+
++ Request (application/json)
+{ 
+   "direct_campaign_id":"10a5ecb1-d816-471f-912c-237962303319",
+   "direct_user_id":"10a5ecb1-d816-471f-912c-237962303319"
+}
+
++ Response 200 (application/json)
+{ 
+   "id":"05eb4cb5-940d-41ce-b928-9667f75590b5"
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "NO CUSTOMER FOUND WITH ID 123"
+      ]
+   }
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "NO CUSTOMER ID"
+      ]
+   }
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "NO CAMPAIGN FOUND"
+      ]
+   }
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "NO USER FOUND"
+      ]
+   }
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "INVALID USER ID"
+      ]
+   }
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "INVALID CAMPAIGN ID"
+      ]
+   }
+}
+
+
+## Remove customer fidelization [/api/customers/$CUSTOMER_ID/direct]
+The route aims to remove customer loyalty.
++ Parameters
++ customer_id:(string) ID of the customer 
+
+
+### Remove Customers Direction [DELETE]
+* To remove customers direction to campaign and user, so that they will not be routed to a specific user or campaign,
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+{ 
+   "id":"05eb4cb5-940d-41ce-b928-9667f75590b5"
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "NO CUSTOMER FOUND WITH ID 123"
+      ]
+   }
+}
+
++ Response 422 (application/json)
+{ 
+   "errors":{ 
+      "direct":[ 
+         "NO CUSTOMER ID"
+      ]
+   }
+}
+
+## Transferences [/api/reports/transferences]
+
++ Parameters
+    + from_agent_id:(string) ID of the agent - from
+    + from_campaign_id:(string) ID of the campaign - from
+    + to_agent_id:(string) ID of the agent - to
+    + to_campaign_id:(string) ID of the campaign - to
+    + customer_id:(string) ID of the customer 
+    + formatted_started_at:(string) Date filter – beginning
+    + formatted_ended_at:(string) Date filter – ending
+    + per:(string) Records by page
+    + page:(string) - Page returned
+
+
+### Transferences Report [GET]
+* Returns a list containing the transferences done according to the informed parameters. 
+* IDs for users can be listed under /api/users/agents. 
+* IDs for campaigns can be listed under /api/campaigns.
+
++ Headers
+    Authorization:Basic ABC123
+    
++ Request
+ {
+    "from_agent_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) ID of the agent - from
+    "from_campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) ID of the campaign - from
+    "to_agent_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) ID of the agent - to
+    "to_campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) ID of the campaign - to
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) ID of the customer 
+    "formatted_started_at": "03/06/2020", // (string) Date filter – beginning
+    "formatted_ended_at": "03/07/2020", // (string) Date filter – ending
+    "per": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) Records by page
+    "page": "fbac1d92-7f85-4a81-97d2-1d2b262df751" // (string) - Page returned
+ }
+
++ Response 200 (application/json)
+{ 
+   "data":[ 
+      { 
+         "id":"db4c8c2b-42bd-4e8d-94dd-24481c71ad9a",
+         "from_agent_id":"189dc593-5065-48df-b49c-5f1b089cc4e9",
+         "from_campaign_id":null,
+         "to_agent_id":"540ed650-1649-4d25-9696-bb051bf2383c",
+         "created_at":"2019-08-20T16:18:52.287-03:00",
+         "from_campaign_name":null,
+         "to_campaign_name":null,
+         "contact_name":"Ronaldo Lohmann",
+         "from_agent_name":"oper1",
+         "to_agent_name":"oper2"
+      },
+      { 
+         "id":"4a9b373a-f304-4c6b-bbdd-c2206c122f6d",
+         "from_agent_id":"540ed650-1649-4d25-9696-bb051bf2383c",
+         "from_campaign_id":null,
+         "to_agent_id":"189dc593-5065-48df-b49c-5f1b089cc4e9",
+         "created_at":"2019-08-20T16:25:10.152-03:00",
+         "from_campaign_name":null,
+         "to_campaign_name":null,
+         "contact_name":"Ronaldo Lohmann",
+         "from_agent_name":"oper2",
+         "to_agent_name":"oper1"
+      },
+      { 
+         "id":"9a52220b-4ffe-4360-b4e1-3d4e24686581",
+         "from_agent_id":"189dc593-5065-48df-b49c-5f1b089cc4e9",
+         "from_campaign_id":null,
+         "to_agent_id":null,
+         "created_at":"2019-08-20T16:25:42.739-03:00",
+         "from_campaign_name":null,
+         "to_campaign_name":"Campanha de teste",
+         "contact_name":"Ronaldo Lohmann",
+         "from_agent_name":"oper1",
+         "to_agent_name":null
+      },
+      { 
+         "id":"6e46f878-2dcd-4e01-8ab0-bfc32bcf95c6",
+         "from_agent_id":"540ed650-1649-4d25-9696-bb051bf2383c",
+         "from_campaign_id":null,
+         "to_agent_id":"189dc593-5065-48df-b49c-5f1b089cc4e9",
+         "created_at":"2019-08-20T16:26:10.478-03:00",
+         "from_campaign_name":null,
+         "to_campaign_name":null,
+         "contact_name":"Ronaldo Lohmann",
+         "from_agent_name":"oper2",
+         "to_agent_name":"oper1"
+      },
+      { 
+         "id":"87be31a9-ef3c-460e-8662-67dfc5cce082",
+         "from_agent_id":"189dc593-5065-48df-b49c-5f1b089cc4e9",
+         "from_campaign_id":null,
+         "to_agent_id":null,
+         "created_at":"2019-08-20T16:27:04.436-03:00",
+         "from_campaign_name":null,
+         "to_campaign_name":"Campanha de teste",
+         "contact_name":"Ronaldo Lohmann",
+         "from_agent_name":"oper1",
+         "to_agent_name":null
+      }
+   ],
+   “total_items”:6
+}
+
+## Ordered Agent Session Detail [/api/reports/ordered_agent_session_detail]
+
+### Ordered Agent Session Detail [GET]
+* Return data corresponding to agent sessions, ordered and with details
+* IDs for users can be listed under /api/users/agents. 
+* IDs for campaigns can be listed under /api/campaigns.
+* IDs for tabulations can be listed under /api/tabulations.
+
+
++ Headers
+    Authorization:Basic ABC123
+    
++ Request
+ 
+ {
+    "formatted_started_at": "03/06/2020", // (string) Date filter – beginning
+    "formatted_ended_at": "03/07/2020", // (string) Date filter – ending
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "user_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "tabulation_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "media": "whatsapp", // whatsapp_enterprise, whatsapp, sms, telegram, facebook, web_chat, widget
+    "customer_name": "John Smith",
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "cpf": "92839289823",
+    "hook_id_filter": "5511982828373",
+    "per": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) Records by page
+    "page": "fbac1d92-7f85-4a81-97d2-1d2b262df751" // (string) - Page returned
+ }
++ Response 200 (application/json)
+{
+    "items": [
+        {
+            "customer": "5511949839683",
+            "system": "whatsapp",
+            "hook_id": "5511943264548",
+            "id": "0976b50a-91ab-4422-a82f-ed93d9b86c36",
+            "origin": "Direct",
+            "result": "Tabulation: bbb1",
+            "phone": "5511949839683",
+            "cpf": null,
+            "campaign": "Cobrança",
+            "direction": "out",
+            "operator": "cobra",
+            "tabulation_group": "AAAAAAAAAAAA",
+            "tabulation": "bbb1",
+            "start": "29/01/2021 11:26:07",
+            "end": "01/02/2021 12:51:10",
+            "customer_start": "29/01/2021 12:53:27",
+            "agent_start": "01/02/2021 12:51:10",
+            "higher_overflow_sec": null,
+            "total_time_sec": 264303,
+            "higher_overflow": "00:00:00",
+            "total_time": "01:25:03",
+            "agent_tmr": 259063,
+            "customer_tmr": null,
+            "sent_amount": 1,
+            "received_amount": 2,
+            "message_amount": 3,
+            "observations": null
+        },
+        {
+            "customer": "Cliente Teste",
+            "system": "telegram",
+            "hook_id": "Voll_bot",
+            "id": "bfb46fc9-7a46-442e-a4b7-8b658308aa58",
+            "origin": "Direct",
+            "result": "Tabulation: bbb1",
+            "phone": "5511949839682",
+            "cpf": "12312",
+            "campaign": "Cobrança",
+            "direction": "in",
+            "operator": "cobra",
+            "tabulation_group": "AAAAAAAAAAAA",
+            "tabulation": "bbb1",
+            "start": "01/02/2021 12:58:22",
+            "end": "01/02/2021 13:33:41",
+            "customer_start": "01/02/2021 12:58:22",
+            "agent_start": "01/02/2021 13:33:41",
+            "higher_overflow_sec": null,
+            "total_time_sec": 2118,
+            "higher_overflow": "00:00:00",
+            "total_time": "00:35:18",
+            "agent_tmr": 2118,
+            "customer_tmr": null,
+            "sent_amount": 2,
+            "received_amount": 1,
+            "message_amount": 3,
+            "observations": null
+        }
+    ],
+    "total_items": 2
+}
+
+## All Agent Sessions [/api/reports/all_agent_sessions]
+
+### All Agent Sessions [GET]
+* Return data corresponding to all agent sessions
+* IDs for users can be listed under /api/users/agents. 
+* IDs for campaigns can be listed under /api/campaigns.
+* IDs for tabulations can be listed under /api/tabulations.
+
+
++ Headers
+    Authorization:Basic ABC123
+    
++ Request
+ 
+ {
+    "formatted_started_at": "03/06/2020", // (string) Date filter – beginning
+    "formatted_ended_at": "03/07/2020", // (string) Date filter – ending
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "user_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "tabulation_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "media": "whatsapp", // whatsapp_enterprise, whatsapp, sms, telegram, facebook, web_chat, widget
+    "customer_name": "John Smith",
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "cpf": "92839289823",
+    "hook_id_filter": "5511982828373",
+    "per": "10", // (string) Records by page
+    "page": "1" // (string) - Page returned
+ }
++ Response 200 (application/json)
+{
+    "items": [
+        [
+            {
+                "customer_name": "Jhon Smith",
+                "system": "telegram",
+                "id": "c7f20ffa-c3a3-4236-9161-9c3d9f1cb5b2",
+                "origin": "Direct",
+                "result": "Ongoing",
+                "customer_id": null,
+                "cpf": null,
+                "campaign_name": "Cobrança",
+                "agent_name": "cobra",
+                "tabulation_name": null,
+                "started_at": "16/02/2021 13:39:40",
+                "ended_at": null,
+                "customer_started_at": "16/02/2021 13:39:40",
+                "agent_started_at": "16/02/2021 13:39:47",
+                "time_exceeded": "00:00:00",
+                "total": 1123022,
+                "total_time": "23:57:02",
+                "agent_tmr": 7,
+                "customer_tmr": null,
+                "sent_count": 3,
+                "received_count": 1,
+                "total_messages": null
+            }
+        ]
+    ],
+    "total_items": 1
+}
+
+## All Agent Sessions Summarized[/api/reports/all_agent_sessions_summarized]
+
+### All Agent Sessions Summarized [GET]
+* Return data corresponding to all agent sessions summarized
+* IDs for users can be listed under /api/users/agents. 
+* IDs for campaigns can be listed under /api/campaigns.
+* IDs for tabulations can be listed under /api/tabulations.
+
+
++ Headers
+    Authorization:Basic ABC123
+    
++ Request
+ 
+ {
+    "formatted_started_at": "03/06/2020", // (string) Date filter – beginning
+    "formatted_ended_at": "03/07/2020", // (string) Date filter – ending
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "user_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "tabulation_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "media": "whatsapp", // whatsapp_enterprise, whatsapp, sms, telegram, facebook, web_chat, widget
+    "customer_name": "John Smith",
+    "customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "cpf": "92839289823",
+    "hook_id_filter": "5511982828373",
+    "per": "10", // (string) Records by page
+    "page": "1" // (string) - Page returned
+ }
++ Response 200 (application/json)
+{
+    "items": [
+        [
+            {
+                "customer_name": "John Smith",
+                "customer_id": null,
+                "cpf": null,
+                "tab_name": null,
+                "ctarted_at": "15/02/2021 12:31:10",
+                "ended_at": null,
+                "time_exceeded": null,
+                "total": 1214340,
+                "tmr": null,
+                "tme": null,
+                "sent_amount": null,
+                "rcvd_amount": null,
+                "total_messages": 0
+            }
+        ],
+        [
+            {
+                "customer_name": "Mohammed",
+                "customer_id": null,
+                "cpf": null,
+                "tab_name": null,
+                "ctarted_at": "16/02/2021 11:52:34",
+                "ended_at": null,
+                "time_exceeded": null,
+                "total": 1130257,
+                "tmr": null,
+                "tme": null,
+                "sent_amount": null,
+                "rcvd_amount": null,
+                "total_messages": 0
+            }
+        ]
+    ],
+    "total_items": 2
+}
+
+## Survey Detail [/api/reports/survey_detail]
+
+### Survey Detail [GET]
+* Returns details about answered customer service suveys answered questions
+* IDs for survey definition (survey_id) can be listed under /api/suveys
+
++ Headers
+    Authorization:Basic ABC123
+    
++ Request
+ 
+ {
+    "formatted_started_at": "03/06/2020", // (string) Date filter – beginning
+    "formatted_ended_at": "03/07/2020", // (string) Date filter – ending
+    "campaign_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "user_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "survey_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+    "per": "fbac1d92-7f85-4a81-97d2-1d2b262df751", // (string) Records by page
+    "page": "fbac1d92-7f85-4a81-97d2-1d2b262df751" // (string) - Page returned
+ }
++ Response 200 (application/json)
+{
+    "items": [
+        {
+            "date": "09/11/2020 18:48:38",
+            "agent": "Teste Ayrton",
+            "customer": "Ayrton",
+            "system": "whatsapp",
+            "customer_number": "5511973503382",
+            "campaign": "CAMPANHA PADRÃO",
+            "survey_name": "testeordem",
+            "question": "pergunta 2",
+            "rate": 2
+        },
+        {
+            "date": "09/11/2020 18:48:38",
+            "agent": "Teste Ayrton",
+            "customer": "Ayrton",
+            "system": "whatsapp",
+            "customer_number": "5511973503382",
+            "campaign": "CAMPANHA PADRÃO",
+            "survey_name": "testeordem",
+            "question": "pergunta 1",
+            "rate": 1
+        },
+        {
+            "date": "09/11/2020 18:00:55",
+            "agent": "Teste Ayrton",
+            "customer": "Ayrton",
+            "system": "whatsapp",
+            "customer_number": "5511973503382",
+            "campaign": "DEMO",
+            "survey_name": "Pesquisa 1",
+            "question": "Responde de 0 a 10",
+            "rate": 1
+        }
+    ],
+    "total_items": 27
+}
+
+## List Agents [/api/users/agents]
+
+### List Agents [GET]
+* Returns key data indicators about the agents
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+   [
+    {
+        "id": "b0033a79-3a8d-4692-b75d-bd3effdf8f4f",
+        "name": "oper4"
+    },
+    {
+        "id": "c27d346a-1ac0-41da-90cf-cc3e84fd123e",
+        "name": "oper2"
+    },
+    {
+        "id": "09a44303-a52d-411e-ae5e-2b9c0974daf9",
+        "name": "oper3"
+    },
+    {
+        "id": "5d5d92f7-25ed-44d8-aca3-c109e53e6c24",
+        "name": "oper5"
+    },
+    {
+        "id": "ffbc0546-0d98-4fb3-b3c6-a88181f72421",
+        "name": "oper1"
+    }
+    ]
+
+
+## Agents Details [/api/reports/agents_detail]
+
++ Parameters
++ user_id:(string) - Id of the agent
++ campaign_id:(string) - ID of the campaign
++ user_status:(string) - Status of the agent
++ per (string) - Records by page
++ page (string) - Page returned
+
+### Agents Details [GET]
+* Returns key data indicators about the agents
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+{ 
+   "data":[ 
+      { 
+         "id":null,
+         "break_started_at":null,
+         "campaign_name":"Campanha de teste",
+         "user_name":"oper1",
+         "user_status":"idle",
+         "break_name":null,
+         "break_duration":null,
+         "user_id":"189dc593-5065-48df-b49c-5f1b089cc4e9",
+         "remaining_time":null
+      },
+      { 
+         "id":null,
+         "break_started_at":null,
+         "campaign_name":"Campanha errada",
+         "user_name":"oper2",
+         "user_status":"offline",
+         "break_name":null,
+         "break_duration":null,
+         "user_id":"540ed650-1649-4d25-9696-bb051bf2383c",
+         "remaining_time":null
+      }
+   ],
+        "total_items":2
+}
+
+## Customer Queue [/api/reports/customer_queue]
+
++ Parameters
++ campaign_id:(string) - ID of the campaign
++ user_status:(string) - Status of the agent
++ per (string) - Records by page
++ page (string) - Page returned
+
+### Customer Queue [GET]
+* Returns a report based on the customer queue,informing the time spent on queue by customer.
+
++ Request
+    + Headers
+        Authorization:Basic ABC123
+
+
++ Response 200 (application/json)
+{ 
+    "data":[ 
+      { 
+         "id":"1f89aa90-3bea-44b1-986a-1a59c0497582",
+         "campaign_id":"d76b4837-d661-44da-81b0-5e107e70286e",
+         "social_contact_id":"9c53a294-e9c8-4779-90a6-6efa8dec944e",
+         "hook_id":"voll_test",
+         "sla_warning":null,
+         "sla_limit":null,
+         "user_id":null,
+         "system":"telegram",
+         "sla":0,
+         "user_name":null,
+         "date_start":"2019-08-23T14:29:17.735Z",
+         "blacklisted":false,
+         "queue_session_id":"1f89aa90-3bea-44b1-986a-1a59c0497582",
+         "customer_name":"Ronaldo Lohmann",
+         "enterprise_id":null,
+         "sms_id":null,
+         "customer_id":null,
+         "campaign_name":"Campanha errada",
+         "survey_id":null,
+         "user_status":null
+      },
+      { 
+         "id":"84093c9d-f1e8-48b4-a26d-bcae84c528ce",
+         "social_contact_id":"dccbe4e4-a4dd-4c74-a627-c7f75cbd588f",
+         "hook_id":"voll_test",
+         "sla_warning":null,
+         "sla_limit":null,
+         "user_id":null,
+         "system":"telegram",
+         "sla":0,
+         "user_name":null,
+         "date_start":"2019-08-23T14:31:55.426Z",
+         "blacklisted":false,
+         "queue_session_id":"84093c9d-f1e8-48b4-a26d-bcae84c528ce",
+         "customer_name":"Giovanni G ",
+         "enterprise_id":null,
+         "sms_id":null,
+         "customer_id":null,
+         "campaign_name":"Campanha errada",
+         "survey_id":null,
+         "user_status":null
+      }
+        ],
+   "total_items":1
+}
+
+
+## Webhooks [/your_url]
+
+
+### Export Attendances [POST]
+* Send info about an attendance when an attendance is concluded. When content is media, it's necessary make download. The link be able just for 2 hours after sent.
+
++ Response (application/json)
+{  
+   "id":"91db7d24-e74c-4a6c-8003-3c3de609eea6",
+   "started_at":"2019-09-30T11:47:05.831-03:00",
+   "ended_at":"2019-09-30T11:47:28.300-03:00",
+   "hook_id":"Sample hook",
+   "agent":{  
+      "id":"660e410d-2978-414e-b6ed-7ef97cc5ac21",
+      "name":"oper2",
+      "login":"oper2"
+   },
+   "customer":{  
+      "id":null,
+      "name":"Owen Wilson",
+      "status": "status field of the customer"
+   },
+   "tabulation":{  
+      "id":"423d0604-f426-4750-b00e-c6b1840a6741",
+      "name":"New tabulation"
+   },
+   "messages":[  
+      {  
+         "content":"Hello!",
+         "direction":"in",
+         "message_type":"text",
+         "date":"2019-09-30T11:47:05.482-03:00",
+         "platform":"telegram",
+         "hook_id":"Sample hook",
+         "sent":"2019-09-30T11:47:05.747-03:00",
+         "read":null,
+         "recvd":"2019-09-30T11:47:05.747-03:00"
+      },
+      {  
+         "content":"No problem !",
+         "direction":"out",
+         "message_type":"text",
+         "date":"2019-09-30T11:47:07.933-03:00",
+         "platform":"telegram",
+         "hook_id":"Sample hook",
+         "sent":"2019-09-30T11:47:09.262-03:00",
+         "read":null,
+         "recvd":"2019-09-30T11:47:09.262-03:00"
+      },
+      {  
+         "content":"Thanks!",
+         "direction":"out",
+         "message_type":"text",
+         "date":"2019-09-30T11:47:09.308-03:00",
+         "platform":"telegram",
+         "hook_id":"Sample hook",
+         "sent":"2019-09-30T11:47:10.508-03:00",
+         "read":null,
+         "recvd":"2019-09-30T11:47:10.508-03:00"
+      },
+      {  
+         "content":"Ending Message",
+         "direction":"out",
+         "message_type":"text",
+         "date":"2019-09-30T11:47:27.092-03:00",
+         "platform":"telegram",
+         "hook_id":null,
+         "sent":"2019-09-30T11:47:28.256-03:00",
+         "read":null,
+         "recvd":"2019-09-30T11:47:28.256-03:00"
+      }
+   ]
+}
+
+### Export Outgoing Attendances [POST]
+* Send info about an attendance when outgoing attendance is started.
+
++ Response (application/json)
+
+{  
+   "session_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+   "customer_id":null,
+   "hook_id":"Sample hook",
+   "agent": {
+        "id": "agent_id",
+        "name": "agent_name",
+        "login": "agent_login"
+   }
+}
+
+### Export Customer Sent to Queue  [POST]
+* Send info when a customer is sent to the queue
+
++ Response (application/json)
+
+{  
+   "session_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+   "customer_id":null,
+   "hook_id":"Sample hook",
+   "status": "customer status field",
+   "queue_count": "how many customers in queue",
+   "tme": "Average waiting time",
+   "agent": {
+        "id": "the agent the customer is waiting to be available",
+        "name": "agent_name",
+        "login": "agent_login"
+   },
+   "campaign": {
+        "name": "campaign name",
+        "id": "campaign id"
+   }
+}
+
+### Export Customer Positions on Queue  [POST]
+* Send info about all customers on queue by campaign when it's updated
+
++ Response (application/json)
+[ 
+     {  
+        "campaign_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+        "social_contact_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+        "hook_id": "5511912345678",
+        "user_id": "c724a92c-3e4b-4564-a0e6-5553a85db6213",
+        "priority": "0",
+        "queue_position": "1"
+        "customer_name": Joao,
+        "status": "customer status field",
+        "widget_id": null,
+        "phone": "5511911111578"
+        "campaign_name": "Support",
+        "started_at": "2021-11-16 22:59:00",
+     },
+     {  
+        "campaign_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+        "social_contact_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+        "hook_id": "5511912345678",
+        "user_id": "c724a92c-3e4b-4564-a0e6-5553a85db6213",
+        "priority": "0",
+        "queue_position": "2"
+        "customer_name": Paula,
+        "status": "customer status field",
+        "widget_id": null,
+        "phone": "5511911111578"
+        "campaign_name": "Support",
+        "started_at": "2021-11-16 23:59:00"
+     },
+     {  
+        "campaign_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+        "social_contact_id":"c724a92c-3e4b-4564-a0e6-5c7a85db6971",
+        "hook_id": "5511912345678",
+        "user_id": "c724a92c-3e4b-4564-a0e6-5553a85db6213",
+        "priority": "0",
+        "queue_position": "1"
+        "customer_name": Joao,
+        "status": "customer status field",
+        "widget_id": null,
+        "phone": "5511911111578"
+        "campaign_name": "Support",
+        "started_at": "2021-11-17 00:00:00"
+     }
+]
+
+### Export Acks  [POST]
+* Send info when Whatsapp send message read status
+
++ Response (application/json)
+
+{
+   "status":"sent",
+   "customer_id":"5511949839683@s.whatsapp.net",
+   "msg_id":"dc3882d1-b318-b591-0419-a41f69cd3f7b",
+   "account_id":"fbac1d92-7f85-4a81-97d2-1d2b262df751",
+   "payload":"teste",
+   "conversation":{
+      "status":"sent",
+      "customer_id":"5511949839683@s.whatsapp.net",
+      "msg_id":"dc3882d1-b318-b591-0419-a41f69cd3f7b",
+      "account_id":"fbac1d92-7f85-4a81-97d2-1d2b262df751"
+   }
+}
+
+## Chatbot [/your_url/{unique_customer_id}${company_phone_number}${customer_phone_number}]
+
+### Text messages [POST]
+* Every message voll receives, it will POST in your API with the message the customer sent to the number and your api should return a list of messages that will be answered to the customer
+
++ Request (application/json)
+{
+ "type": "text",
+ "text": "Hello I need some help"
+}
+
++ Response (application/json)
+{
+    "responses": [
+        {
+            "type": "text",
+            "text": "Hi my name is CHATBOT, how can I help you?"
+        }
+    ]
+}
+
+### Send public file [POST]
+* In order to end a chat, you need to provide a response with the following text pattern: #file_external#;public url;file type(audio, video, document, image)
++ Request (application/json)
+{
+ "type": "text",
+ "text": "Ok thanks, that will work."
+}
+
++ Response (application/json)
+{
+    "responses": [
+        {
+            "type": "text",
+            "text": "#file_external#;http://www.africau.edu/images/default/sample.pdf;teste.pdf;document;application/pdf"
+        }
+    ]
+}
+
+### End chat and tabulate [POST]
+* In order to end a chat, you need to provide a response with the following text pattern: #tabulate#;TABULATION_ID;OBSERVATIONS
+
++ Request (application/json)
+{
+ "type": "text",
+ "text": "Ok thanks, that will work."
+}
+
++ Response (application/json)
+{
+    "responses": [
+        {
+            "type": "text",
+            "text": "#tabulate#;XXXX;any obs you may want"
+        }
+    ]
+}
+
+### Transfer chat to human/campaign [POST]
+* In order to transfer the chat to human agents, you need to provide a response with the following text pattern: #transfer#;CAMPAIGN_ID;OBSERVATIONS
+
++ Request (application/json)
+{
+ "type": "text",
+ "text": "I want to talk to a human"
+}
+
++ Response (application/json)
+{
+    "responses": [
+        {
+            "type": "text",
+            "text": "#transfer#;XXXX;Any obs you may want"
+        }
+    ]
+}
+
+### Man in the middle [DELETE]
+* When an admin interferes with the chatbot attendance by transferring it to another agent or tabulating the session, a DELETE request is send to the chatbot, informing that it needs to start over if the customer sends a new message to the bot.
+
++ Response 204
+
+## Message [/api/messages]
+
+### Send messages [POST]
+* Send a message to customer from external application
+
++ Request (application/json)
+{
+ "hook_id": "11988889999" ,
+ "unique_customer_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751",
+ "customer_id: "11988889999",
+ "enterpise_id": "11988889999",
+ "sms_id": "11988889999",
+ "telegram_id: "11988889999",
+ "platform": "whatsapp_enterprise",
+ "campaign_name": "campanha de teste",
+ "msg_id": "fbac1d92-7f85-4a81-97d2-1d2b262df751"
+ "file_url": "",
+ "title": "",
+ "mime": "",
+ "is_file": "",
+ "content": "",
+ "message_type": "",  // "text", "image", "audio", "document"
+ "is_close": "", // true ou false
+ "tabulation_id": "",
+ "transfer_as_inbound": "",
+ "to_id": ""
+}
+
++ Response 200 (application/json)
+
+
+
+
